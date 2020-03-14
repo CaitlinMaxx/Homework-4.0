@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <title>Javascript Quiz</title>
+
+        <link rel="stylesheet" href="style.css">
+        <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    </head>
+    <body>
+        <header>
+            <p id="safeTimerDisplay"><span id="time">5:00</span></p>
+            <h1>JavaScript Quiz</h1>
+        </header>
+        <section class="main-bit2">
+            <div class="quiz-container">
+                <div id="quiz"></div>
+            </div>
+            <br>
+            <br>
+            <br>
+            <br>
+            <button id="previous">Previous Question</button>
+            <button id="next">Next Question</button>
+            <button id="submit">Submit Quiz</button>
+            <div id="results"></div>
+            <br>
+            <br>
+            <div id="saveResult"></div>
+        </section>
+       
+        <script type="text/javascript">
+            
+            function startTimer(duration, display) {
+                var timer = duration, minutes, seconds;
+                setInterval(function () {
+                    minutes = parseInt(timer / 60, 10)
+                    seconds = parseInt(timer % 60, 10);
+
+                    minutes = minutes < 10 ? "0" + minutes : minutes;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                    display.textContent = minutes + ":" + seconds;
+
+                    if (--timer < 0) {
+                        timer = duration;
+                    }
+                    if(--timer === 0){
+                        alert("Sorry, you ran out of time")
+                        $(location).attr('href', 'introduction.html')
+                    }
+
+                }, 1000);
+            }
+
+            window.onload = function () {
+           
+                var Mins = 60 * 5,
+                    display = document.querySelector('#time');
+                startTimer(Mins, display);
+            };
+            
+            const quizContainer = document.getElementById('quiz');
+            const resultsContainer = document.getElementById('results');
+            const submitButton = document.getElementById('submit');
+            const myQuestions = [
+            {
+                question: "Commonly used data types does NOT include?",
+                answers: {
+                a: "Booleans",
+                b: "Strings",
+                c: "Alerts",
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "The condition in an if/else statement is enclosed within ___.",
+                answers: {
+                a: "Quotes",
+                b: "Parentheses",
+                c: "Curly Brackets",
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "Arrays in JavaScript can be used to store ____.",
+                answers: {
+                a: "Numbers and Strings",
+                b: "Other Arrays",
+                c: "All of the Above",
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "String values must be enclosed within ____ when being assigned to variables.",
+                answers: {
+                a: "Quotes",
+                b: "Curly Brackets",
+                c: "Parentheses",
+                
+                },
+                correctAnswer: "a"
+            },
+            {
+                question: "A very useful tool used during development and debugging for printing content to the debugger is:",
+                answers: {
+                a: "JavaScript",
+                b: "Terminal/Bash",
+                c: "console.log",
+                },
+                correctAnswer: "c"
+            }
+            ];
+            
+            function buildQuiz(){
+                
+                const output = [];
+
+                myQuestions.forEach(
+                    (currentQuestion, questionNumber) => {
+
+                        const answers = [];
+
+                        for(letter in currentQuestion.answers){
+
+                            answers.push(
+                            `<label>
+                                <input type="radio" name="question${questionNumber}" value="${letter}">
+                                ${letter} :
+                                ${currentQuestion.answers[letter]}
+                            </label>
+                            <br>`
+                            );
+                        }
+
+                        output.push(
+                            `<div class="slide">
+                                <div class="question"> ${currentQuestion.question} </div>
+                                <div class="answers"> ${answers.join('')} </div>
+                            </div>`
+                        );
+                    }
+                );
+
+                quizContainer.innerHTML = output.join('');
+                
+            }
+
+            function showResults(){
+
+                const answerContainers = quizContainer.querySelectorAll('.answers');
+
+                let numCorrect = 0;
+
+                myQuestions.forEach( (currentQuestion, questionNumber) => {
+
+                const answerContainer = answerContainers[questionNumber];
+                const selector = `input[name=question${questionNumber}]:checked`;
+                const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+
+                if(userAnswer === currentQuestion.correctAnswer){
+
+                    numCorrect++;
+
+                    answerContainers[questionNumber].style.color = 'green';
+                }
+
+                else{
+
+                    answerContainers[questionNumber].style.color = 'red';
+                }
+                });
+
+                resultsContainer.innerHTML = `${numCorrect} out of ${myQuestions.length}`;
+
+            }
+            
+            function showSlide(n) {
+                slides[currentSlide].classList.remove('active-slide');
+                slides[n].classList.add('active-slide');
+                currentSlide = n;
+                if(currentSlide === 0){
+                    previousButton.style.display = 'none';
+                }
+                else{
+                    previousButton.style.display = 'inline-block';
+                }
+                if(currentSlide === slides.length-1){
+                    nextButton.style.display = 'none';
+                    submitButton.style.display = 'inline-block';
+                }
+                else{
+                    nextButton.style.display = 'inline-block';
+                    submitButton.style.display = 'none';
+                }
+            }
+
+            buildQuiz();
+
+            const previousButton = document.getElementById("previous");
+            const nextButton = document.getElementById("next");
+            const slides = document.querySelectorAll(".slide");
+            let currentSlide = 0;
+            
+            showSlide(currentSlide);
+
+            function showNextSlide() {
+                showSlide(currentSlide + 1);
+            }
+
+            function showPreviousSlide() {
+                showSlide(currentSlide - 1);
+            }
+
+            previousButton.addEventListener("click", showPreviousSlide);
+            nextButton.addEventListener("click", showNextSlide);
+            $(submitButton).on('click', function(){
+                showResults()
+                var save = $('<input type="button" value="Save Score" />');
+                save.appendTo($("#saveResult"));
+            });
+
+
+            
+
+        </script>
+    </body>
+</html>
